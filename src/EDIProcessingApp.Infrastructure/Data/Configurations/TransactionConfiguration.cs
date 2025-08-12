@@ -11,6 +11,9 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
     {
         builder.HasKey(x => x.Id);
         
+        builder.Property(x => x.EdiTransactionTypeId)
+            .IsRequired(false); // Optional foreign key
+            
         builder.Property(x => x.TransactionType)
             .IsRequired()
             .HasMaxLength(50);
@@ -40,6 +43,11 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .WithMany(x => x.Transactions)
             .HasForeignKey(x => x.FileId)
             .OnDelete(DeleteBehavior.Cascade);
+            
+        builder.HasOne(x => x.EdiTransactionType)
+            .WithMany(x => x.Transactions)
+            .HasForeignKey(x => x.EdiTransactionTypeId)
+            .OnDelete(DeleteBehavior.SetNull);
             
         builder.HasOne(x => x.Account)
             .WithMany(x => x.Transactions)

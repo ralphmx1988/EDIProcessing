@@ -19,6 +19,9 @@ public class EdiFileConfiguration : IEntityTypeConfiguration<EdiFile>
             .IsRequired()
             .HasMaxLength(50);
             
+        builder.Property(x => x.EdiTransactionTypeId)
+            .IsRequired(false); // Optional foreign key
+            
         builder.Property(x => x.TransactionType)
             .IsRequired()
             .HasMaxLength(50);
@@ -47,6 +50,11 @@ public class EdiFileConfiguration : IEntityTypeConfiguration<EdiFile>
         builder.HasOne(x => x.Account)
             .WithMany(x => x.EdiFiles)
             .HasForeignKey(x => x.AccountId)
+            .OnDelete(DeleteBehavior.SetNull);
+            
+        builder.HasOne(x => x.EdiTransactionType)
+            .WithMany(x => x.EdiFiles)
+            .HasForeignKey(x => x.EdiTransactionTypeId)
             .OnDelete(DeleteBehavior.SetNull);
             
         builder.HasMany(x => x.Transactions)

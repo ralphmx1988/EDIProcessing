@@ -16,9 +16,11 @@ public class EdiFile
     [MaxLength(50)]
     public string FileType { get; set; } = string.Empty; // X12, EDIFACT
     
+    public int? EdiTransactionTypeId { get; set; } // Foreign key to EdiTransactionType
+    
     [Required]
     [MaxLength(50)]
-    public string TransactionType { get; set; } = string.Empty; // 850, 810, etc.
+    public string TransactionType { get; set; } = string.Empty; // 850, 810, etc. (kept for backwards compatibility)
     
     [Required]
     [MaxLength(50)]
@@ -46,5 +48,6 @@ public class EdiFile
     
     // Navigation properties
     public virtual Account? Account { get; set; }
+    public virtual EdiTransactionType? EdiTransactionType { get; set; }
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

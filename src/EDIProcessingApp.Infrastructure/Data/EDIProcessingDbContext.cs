@@ -18,6 +18,7 @@ public class EDIProcessingDbContext : DbContext
     public DbSet<AccountType> AccountTypes { get; set; }
     public DbSet<AccountConfiguration> AccountConfigurations { get; set; }
     public DbSet<EdiFile> EdiFiles { get; set; }
+    public DbSet<EdiTransactionType> EdiTransactionTypes { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

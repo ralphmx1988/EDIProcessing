@@ -10,9 +10,11 @@ public class Transaction
     
     public Guid FileId { get; set; }
     
+    public int? EdiTransactionTypeId { get; set; } // Foreign key to EdiTransactionType
+    
     [Required]
     [MaxLength(50)]
-    public string TransactionType { get; set; } = string.Empty; // Purchase Order, Invoice, etc.
+    public string TransactionType { get; set; } = string.Empty; // Purchase Order, Invoice, etc. (kept for backwards compatibility)
     
     [Required]
     [MaxLength(100)]
@@ -33,5 +35,6 @@ public class Transaction
     
     // Navigation properties
     public virtual EdiFile File { get; set; } = null!;
+    public virtual EdiTransactionType? EdiTransactionType { get; set; }
     public virtual Account? Account { get; set; }
 }

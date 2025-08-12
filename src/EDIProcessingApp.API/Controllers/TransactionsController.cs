@@ -4,24 +4,15 @@ using EDIProcessingApp.Core.Interfaces;
 
 namespace EDIProcessingApp.API.Controllers;
 
+
 [ApiController]
 [Route("api/[controller]")]
-public class TransactionsController : ControllerBase
+public class TransactionsController(
+    ITransactionRepository transactionRepository,
+    IEdiProcessingService ediProcessingService,
+    ILogger<TransactionsController> logger)
+    : ControllerBase
 {
-    private readonly ITransactionRepository _transactionRepository;
-    private readonly IEdiProcessingService _ediProcessingService;
-    private readonly ILogger<TransactionsController> _logger;
-
-    public TransactionsController(
-        ITransactionRepository transactionRepository,
-        IEdiProcessingService ediProcessingService,
-        ILogger<TransactionsController> logger)
-    {
-        _transactionRepository = transactionRepository;
-        _ediProcessingService = ediProcessingService;
-        _logger = logger;
-    }
-
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Transaction>>> GetTransactions(
         [FromQuery] string? status = null,
@@ -34,26 +25,26 @@ public class TransactionsController : ControllerBase
 
             if (accountId.HasValue)
             {
-                transactions = await _transactionRepository.GetByAccountIdAsync(accountId.Value);
+                transactions = await transactionRepository.GetByAccountIdAsync(accountId.Value);
             }
             else if (!string.IsNullOrEmpty(partnerId))
             {
-                transactions = await _transactionRepository.GetByPartnerIdAsync(partnerId);
+                transactions = await transactionRepository.GetByPartnerIdAsync(partnerId);
             }
             else if (!string.IsNullOrEmpty(status))
             {
-                transactions = await _transactionRepository.GetByStatusAsync(status);
+                transactions = await transactionRepository.GetByStatusAsync(status);
             }
             else
             {
-                transactions = await _transactionRepository.GetAllAsync();
+                transactions = await transactionRepository.GetAllAsync();
             }
 
             return Ok(transactions);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving transactions");
+            logger.LogError(ex, "Error retrieving transactions");
             return StatusCode(500, "Internal server error");
         }
     }
@@ -63,7 +54,7 @@ public class TransactionsController : ControllerBase
     {
         try
         {
-            var transaction = await _transactionRepository.GetByIdAsync(id);
+            var transaction = await transactionRepository.GetByIdAsync(id);
             if (transaction == null)
             {
                 return NotFound();
@@ -72,7 +63,7 @@ public class TransactionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving transaction {TransactionId}", id);
+            logger.LogError(ex, "Error retrieving transaction {TransactionId}", id);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -82,13 +73,13 @@ public class TransactionsController : ControllerBase
     {
         try
         {
-            var transaction = await _transactionRepository.GetByIdAsync(id);
+            var transaction = await transactionRepository.GetByIdAsync(id);
             if (transaction == null)
             {
                 return NotFound();
             }
 
-            var success = await _ediProcessingService.SendAcknowledgmentAsync(transaction);
+            var success = await ediProcessingService.SendAcknowledgmentAsync(transaction);
             
             var response = new AcknowledgeResponse(
                 transaction.Id,
@@ -100,7 +91,7 @@ public class TransactionsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending acknowledgment for transaction {TransactionId}", id);
+            logger.LogError(ex, "Error sending acknowledgment for transaction {TransactionId}", id);
             return StatusCode(500, "Internal server error");
         }
     }
@@ -110,12 +101,12 @@ public class TransactionsController : ControllerBase
     {
         try
         {
-            var transactions = await _transactionRepository.GetByPartnerIdAsync(partnerId);
+            var transactions = await transactionRepository.GetByPartnerIdAsync(partnerId);
             return Ok(transactions);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving transactions for partner {PartnerId}", partnerId);
+            logger.LogError(ex, "Error retrieving transactions for partner {PartnerId}", partnerId);
             return StatusCode(500, "Internal server error");
         }
     }

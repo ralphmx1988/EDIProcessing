@@ -27,6 +27,7 @@ builder.Services.AddSingleton<BlobServiceClient>(provider =>
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<IAccountTypeRepository, AccountTypeRepository>();
 builder.Services.AddScoped<IEdiFileRepository, EdiFileRepository>();
+builder.Services.AddScoped<IEdiTransactionTypeRepository, EdiTransactionTypeRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 
 // Register services
